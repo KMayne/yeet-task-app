@@ -7,7 +7,7 @@
       </li>
       <li>
         <i class="checkbox material-icons">add</i>
-        <span contenteditable="true"></span>
+        <span contenteditable="true"/>
       </li>
       <li v-for="item in doneItems">
         <i class="checkbox material-icons" @click="() => item.done = false">check_box</i>
@@ -27,9 +27,9 @@ export default Vue.extend({
   },
   data: () => ({
     items: [
-      { id: 1, text: "Item 1", done: false },
-      { id: 2, text: "Item 2", done: false },
-      { id: 3, text: "Item 3", done: true }
+      { id: 1, text: 'Item 1', done: false },
+      { id: 2, text: 'Item 2', done: false },
+      { id: 3, text: 'Item 3', done: true }
     ]
   }),
   computed: {
