@@ -4,6 +4,14 @@
   </div>
 </template>
 
+<script lang="ts">
+  import Vue from 'vue';
+
+  export default Vue.extend({
+    name: 'app'
+  });
+</script>
+
 <style>
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;

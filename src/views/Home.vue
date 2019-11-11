@@ -19,30 +19,36 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
+import { Task } from '@/task';
 
 export default Vue.extend({
   name: 'home',
-  components: {
-  },
+  props: [],
+  components: {},
   data: () => ({
-    items: [
-      { id: 1, text: 'Item 1', done: false },
-      { id: 2, text: 'Item 2', done: false },
-      { id: 3, text: 'Item 3', done: true }
-    ]
-  }),
+    loading: true,
+    tasks: []
+  } as HomeState),
   computed: {
     todoItems() {
-      return this.items.filter(i => !i.done);
+      return this.tasks.filter(i => !i.done);
     },
     doneItems() {
-      return this.items.filter(i => i.done);
+      return this.tasks.filter(i => i.done);
     }
   },
-  methods: {
+  methods: {},
+  mounted(): void {
+    fetch('/api/tasks')
+      .then(res => res.json())
+      .then(tasks => this.tasks = tasks);
   }
 });
+
+interface HomeState {
+  loading: boolean;
+  tasks: Task[];
+}
 </script>
 
 <style>
