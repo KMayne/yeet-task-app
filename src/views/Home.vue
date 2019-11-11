@@ -4,11 +4,12 @@
     <ul class="todo-list">
       <li v-for="item in todoItems">
         <i class="checkbox material-icons" @click="() => item.done = true">check_box_outline_blank</i>
-        <span contenteditable="true">{{item.text}}</span>
+        <span v-focus contenteditable="true">{{item.text}}</span>
       </li>
       <li>
         <i class="checkbox material-icons">add</i>
-        <span contenteditable="true"/>
+        <span ref="taskInput" contenteditable="true" @input="({data}) => addBoxChanged(data)"
+              @paste="addBoxPasted" />
       </li>
       <li v-for="item in doneItems">
         <i class="checkbox material-icons" @click="() => item.done = false">check_box</i>
@@ -26,25 +27,44 @@ import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
 
 import { Task } from '@/task';
+import { focus } from '@/directives/focus';
 
 export default Vue.extend({
   name: 'home',
   components: {
     Loading
   },
+  directives: {
+    focus
+  },
   data: () => ({
     loading: true,
     tasks: []
   } as HomeState),
   computed: {
-    todoItems() {
+    todoItems(): Task[] {
       return this.tasks.filter(i => !i.done);
     },
-    doneItems() {
+    doneItems(): Task[] {
       return this.tasks.filter(i => i.done);
+    },
+    maxId(): number {
+      return this.tasks.reduce((max, t) => Math.max(t.id, max), 0);
     }
   },
-  methods: {},
+  methods: {
+    addBoxChanged(text: string) {
+      if (!text) return;
+      this.tasks.push({id: this.maxId + 1, text, done: false});
+      (this.$refs.taskInput as HTMLElement).innerText = '';
+    },
+    addBoxPasted(event: ClipboardEvent) {
+      event.preventDefault();
+      const text = event.clipboardData?.getData('text');
+      if (!text) return;
+      this.addBoxChanged(text);
+    }
+  },
   mounted(): void {
     fetch('/api/tasks')
       .then(res => res.json())
