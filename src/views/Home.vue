@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <loading :active="loading" />
     <ul class="todo-list">
       <li v-for="item in todoItems">
         <i class="checkbox material-icons" @click="() => item.done = true">check_box_outline_blank</i>
@@ -19,12 +20,18 @@
 
 <script lang="ts">
 import Vue from 'vue';
+// Import component
+import Loading from 'vue-loading-overlay';
+// Import stylesheet
+import 'vue-loading-overlay/dist/vue-loading.css';
+
 import { Task } from '@/task';
 
 export default Vue.extend({
   name: 'home',
-  props: [],
-  components: {},
+  components: {
+    Loading
+  },
   data: () => ({
     loading: true,
     tasks: []
@@ -41,7 +48,10 @@ export default Vue.extend({
   mounted(): void {
     fetch('/api/tasks')
       .then(res => res.json())
-      .then(tasks => this.tasks = tasks);
+      .then(tasks => {
+        this.tasks = tasks;
+        this.loading = false;
+      });
   }
 });
 
