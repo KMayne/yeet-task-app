@@ -27,4 +27,8 @@
 header {
   padding: 8px;
 }
+
+header > a {
+  text-decoration: none;
+}
 </style>
