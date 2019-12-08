@@ -1,6 +1,5 @@
 <template>
   <div class="home">
-    <header>YeetTask</header>
     <loading :active="loading" />
     <ul class="todo-list">
       <li v-for="item in todoItems">

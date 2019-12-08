@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <header>YeetTask</header>
     <router-view/>
   </div>
 </template>
