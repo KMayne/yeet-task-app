@@ -2,17 +2,17 @@
   <div class="home">
     <loading :active="loading" />
     <ul class="todo-list">
-      <li v-for="item in todoItems">
-        <i class="checkbox material-icons" @click="() => item.done = true">check_box_outline_blank</i>
-        <editable-span v-focus v-model="item.text" />
+      <li v-for="todo in todoItems">
+        <i class="checkbox material-icons" @click="() => { todo.done = true; saveTask(todo); }">check_box_outline_blank</i>
+        <editable-span v-focus v-model="todo.text" @input="() => saveTask(todo)" />
       </li>
       <li>
         <i class="checkbox material-icons">add</i>
         <span ref="taskInput" contenteditable="true" @input="({data}) => addBoxChanged(data)" @paste="addBoxPasted" />
       </li>
-      <li v-for="item in doneItems">
-        <i class="checkbox material-icons" @click="() => item.done = false">check_box</i>
-        <editable-span class="done" v-focus v-model="item.text" />
+      <li v-for="todo in doneItems">
+        <i class="checkbox material-icons" @click="() => { todo.done = false; saveTask(todo); }">check_box</i>
+        <editable-span class="done" v-focus v-model="todo.text" @change="() => saveTask(todo)" />
       </li>
     </ul>
   </div>
@@ -25,7 +25,7 @@ import Loading from 'vue-loading-overlay';
 // Import stylesheet
 import 'vue-loading-overlay/dist/vue-loading.css';
 
-import { Task } from '@/task';
+import { Task, makeTask } from '@/task';
 import { focus } from '@/directives/focus';
 import Editable from '@/components/EditableSpan.vue';
 
@@ -38,25 +38,24 @@ export default Vue.extend({
   directives: {
     focus
   },
+  pouch: {
+    tasks: {}
+  },
   data: () => ({
-    loading: true,
-    tasks: []
+    loading: false,
   } as HomeState),
   computed: {
     todoItems(): Task[] {
-      return this.tasks.filter(i => !i.done);
+      return this.tasks?.filter(i => !i.done) || [];
     },
     doneItems(): Task[] {
-      return this.tasks.filter(i => i.done);
+      return this.tasks?.filter(i => i.done) || [];
     },
-    maxId(): number {
-      return this.tasks.reduce((max, t) => Math.max(t.id, max), 0);
-    }
   },
   methods: {
     addBoxChanged(text: string) {
       if (!text) return;
-      this.tasks.push({id: this.maxId + 1, text, done: false});
+      this.saveTask(makeTask(text, false));
       (this.$refs.taskInput as HTMLElement).innerText = '';
     },
     addBoxPasted(event: ClipboardEvent) {
@@ -64,15 +63,10 @@ export default Vue.extend({
       const text = event.clipboardData?.getData('text');
       if (!text) return;
       this.addBoxChanged(text);
+    },
+    saveTask(task: Task) {
+      this.$pouch.put(task, undefined, 'tasks');
     }
-  },
-  mounted(): void {
-    fetch('/api/tasks')
-      .then(res => res.json())
-      .then(tasks => {
-        this.tasks = tasks;
-        this.loading = false;
-      });
   }
 });
 
