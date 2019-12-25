@@ -4,16 +4,15 @@
     <ul class="todo-list">
       <li v-for="item in todoItems">
         <i class="checkbox material-icons" @click="() => item.done = true">check_box_outline_blank</i>
-        <span v-focus contenteditable="true">{{item.text}}</span>
+        <editable-span v-focus v-model="item.text" />
       </li>
       <li>
         <i class="checkbox material-icons">add</i>
-        <span ref="taskInput" contenteditable="true" @input="({data}) => addBoxChanged(data)"
-              @paste="addBoxPasted" />
+        <span ref="taskInput" contenteditable="true" @input="({data}) => addBoxChanged(data)" @paste="addBoxPasted" />
       </li>
       <li v-for="item in doneItems">
         <i class="checkbox material-icons" @click="() => item.done = false">check_box</i>
-        <span class="done" contenteditable="true">{{item.text}}</span>
+        <editable-span class="done" v-focus v-model="item.text" />
       </li>
     </ul>
   </div>
@@ -28,11 +27,13 @@ import 'vue-loading-overlay/dist/vue-loading.css';
 
 import { Task } from '@/task';
 import { focus } from '@/directives/focus';
+import Editable from '@/components/EditableSpan.vue';
 
 export default Vue.extend({
   name: 'home',
   components: {
-    Loading
+    Loading,
+    Editable
   },
   directives: {
     focus
