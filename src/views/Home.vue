@@ -55,7 +55,7 @@ export default Vue.extend({
   methods: {
     addBoxChanged() {
       if (this.newText === '') return;
-      this.taskChanged(makeTask(this.newText, false));
+      this.$pouch.put(makeTask(this.newText, false), undefined, 'tasks');
       this.newText = '';
     },
     toggleDone(task: Task) {
