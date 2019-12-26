@@ -19,8 +19,6 @@ Vue.use(PouchVue, {
   defaultDB: 'tasks',
 });
 
-const db = new PouchDB('tasks');
-
 new Vue({
   router,
   render: h => h(App),

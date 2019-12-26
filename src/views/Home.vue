@@ -3,16 +3,16 @@
     <loading :active="loading" />
     <ul class="todo-list">
       <li v-for="todo in todoItems">
-        <i class="checkbox material-icons" @click="() => { todo.done = true; saveTask(todo); }">check_box_outline_blank</i>
-        <editable-span v-focus v-model="todo.text" @input="() => saveTask(todo)" />
+        <i class="checkbox material-icons" @click="() => toggleDone(todo)">check_box_outline_blank</i>
+        <input v-focus v-model="todo.text" @input="() => taskChanged(todo)" />
       </li>
       <li>
         <i class="checkbox material-icons">add</i>
-        <span ref="taskInput" contenteditable="true" @input="({data}) => addBoxChanged(data)" @paste="addBoxPasted" />
+        <input v-model="newText" @input="addBoxChanged" />
       </li>
       <li v-for="todo in doneItems">
-        <i class="checkbox material-icons" @click="() => { todo.done = false; saveTask(todo); }">check_box</i>
-        <editable-span class="done" v-focus v-model="todo.text" @change="() => saveTask(todo)" />
+        <i class="checkbox material-icons" @click="() => toggleDone(todo)">check_box</i>
+        <input class="done" v-model="todo.text" @input="() => taskChanged(todo)" />
       </li>
     </ul>
   </div>
@@ -24,16 +24,15 @@ import Vue from 'vue';
 import Loading from 'vue-loading-overlay';
 // Import stylesheet
 import 'vue-loading-overlay/dist/vue-loading.css';
+import debounce from 'lodash/debounce';
 
 import { Task, makeTask } from '@/task';
 import { focus } from '@/directives/focus';
-import Editable from '@/components/EditableSpan.vue';
 
 export default Vue.extend({
   name: 'home',
   components: {
-    Loading,
-    Editable
+    Loading
   },
   directives: {
     focus
@@ -43,6 +42,7 @@ export default Vue.extend({
   },
   data: () => ({
     loading: false,
+    newText: ''
   } as HomeState),
   computed: {
     todoItems(): Task[] {
@@ -53,19 +53,17 @@ export default Vue.extend({
     },
   },
   methods: {
-    addBoxChanged(text: string) {
-      if (!text) return;
-      this.saveTask(makeTask(text, false));
-      (this.$refs.taskInput as HTMLElement).innerText = '';
+    addBoxChanged() {
+      if (this.newText === '') return;
+      this.taskChanged(makeTask(this.newText, false));
+      this.newText = '';
     },
-    addBoxPasted(event: ClipboardEvent) {
-      event.preventDefault();
-      const text = event.clipboardData?.getData('text');
-      if (!text) return;
-      this.addBoxChanged(text);
+    toggleDone(task: Task) {
+        task.done = !task.done;
+        this.taskChanged(task);
     },
-    saveTask(task: Task) {
-      this.$pouch.put(task, undefined, 'tasks');
+    taskChanged(task: Task) {
+      debounce(() => this.$pouch.put(task, undefined, 'tasks'), 500);
     }
   }
 });
@@ -73,6 +71,7 @@ export default Vue.extend({
 interface HomeState {
   loading: boolean;
   tasks: Task[];
+  newText: string;
 }
 </script>
 
@@ -105,12 +104,13 @@ interface HomeState {
   flex: none;
 }
 
-.todo-list > li > span {
+.todo-list > li > input {
   display: inline-block;
   flex: auto;
+  border: none;
 }
 
-.todo-list span.done {
+.todo-list .done {
   text-decoration: line-through;
 }
 

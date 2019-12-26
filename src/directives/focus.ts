@@ -5,7 +5,5 @@ export const focus = Vue.directive('focus', {
     inserted(el) {
         // Focus the element
         el.focus();
-        const sel = window.getSelection() || { collapse: () => console.warn('Could not get selection') };
-        sel.collapse(el.firstChild, el?.firstChild?.textContent?.length);
     }
 });
