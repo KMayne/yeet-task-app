@@ -17,7 +17,7 @@
     "@vue/cli-plugin-typescript": "^3.12.0",
     "@vue/cli-service": "^4.1.1",
     "core-js": "^2.6.5",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "normalize.css": "^8.0.1",
     "pouch-vue": "^0.3.5",
     "pouchdb-browser": "^7.1.1",
